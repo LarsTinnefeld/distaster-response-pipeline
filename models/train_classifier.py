@@ -19,12 +19,13 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+
 def load_data(database_filepath):
     '''
     Function to load data from an sql database, stores in a dataframe and splits into input- and output features
-    
+
     Input: Database and path
-    
+
     Outputs:
     - Dataframe
     - Input feature vector "messages"
@@ -34,47 +35,66 @@ def load_data(database_filepath):
     df = pd.read_sql_table('responses', engine)
 
     X = df['message']
-    Y = df.drop(['message', 'genre', 'id'], axis = 1)
+    Y = df.drop(['message', 'genre', 'id'], axis=1)
 
     return X, Y
 
+
 def tokenize(text):
     '''Function that takes in a text splits with white spaces and creates list of words'''
-    text = text.lower() 
+    text = text.lower()
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
-    
+
     word_list = nltk.tokenize.word_tokenize(text)
     word_list = [n for n in word_list if n not in stopwords.words("english")]
-    
-    lemmed_list = [WordNetLemmatizer().lemmatize(n, pos='v') for n in word_list]
-    
+
+    lemmed_list = [WordNetLemmatizer().lemmatize(n, pos='v')
+                   for n in word_list]
+
     return lemmed_list
 
 
 def build_model():
     '''
     Function to specify a model and prepares the learning procedure
-    
+
     Imput: None
-    
+
     Output: Model which was fit to the data
     '''
-    
+
     pipeline = Pipeline([
         ('text_pipeline', Pipeline([
             ('vect', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer())
-            ])),
+        ])),
         ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    '''
+    Function to set up a model (pipeline), split data into train and test sets and train the model
+
+    Inputs:
+    - model
+    - X_test
+    - Y_test
+    - category names
+
+    Output: None
+    '''
+
+    # Make predictions with test data
+    pred_test = model.predict(X_test)
+
+    # Classification report
+    print(classification_report(y_test, y_pred, target_names=category_names))
 
 
 def save_model(model, model_filepath):
-    pass
+    """Function to save model as pickle file"""
+    pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
@@ -82,14 +102,15 @@ def main():
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
-        
+        X_train, X_test, Y_train, Y_test = train_test_split(
+            X, Y, test_size=0.2)
+
         print('Building model...')
         model = build_model()
-        
+
         print('Training model...')
         model.fit(X_train, Y_train)
-        
+
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)
 
@@ -99,9 +120,9 @@ def main():
         print('Trained model saved!')
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
+        print('Please provide the filepath of the disaster messages database '
+              'as the first argument and the filepath of the pickle file to '
+              'save the model to as the second argument. \n\nExample: python '
               'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
 
 
