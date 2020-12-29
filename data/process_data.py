@@ -19,23 +19,21 @@ def load_data(messages_filepath, categories_filepath):
 
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    df = messages.merge(categories)
+    df = messages.merge(categories, how='inner', on='id')
 
     # Splitting the category column into individual category columns
     categories = categories['categories'].str.split(';', expand=True)
     cols = categories.iloc[0].str.split('-').str[0]
     categories.columns = cols
 
-    # Extracting 1 or 0 in each category column
+    # create a dataframe of the 36 individual category columns
+    categories = categories['categories'].str.split(';', expand=True)
+    cols = categories.iloc[0].str.split('-').str[0]
+    categories.columns = cols
+
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].str[-1].astype(int)
-
-    # drop the original categories column from `df`
-    df.drop('categories', axis=1, inplace=True)
-
-    # concatenate the original dataframe with the new `categories` dataframe
-    df = pd.concat([df, categories], axis=1)
 
     return df
 
@@ -49,11 +47,8 @@ def clean_data(df):
     Output: Clean dataframe
     '''
 
-    # Need to drop 'original' in order not to drop based on empties in that column
-    df.drop('original', axis=1, inplace=True)
-
-    # Deleting empty records
-    df.dropna(inplace=True)
+    # Dropping all rows where categories have no entry
+    df = df[df['related'].notna()]
 
     # drop duplicates
     df.drop_duplicates(inplace=True)
@@ -62,8 +57,18 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
-    engine = create_engine(database_filename, encoding="UTF-8")
-    df.to_sql('responses', engine, index=False)
+    '''
+    Function to receive dataframe and saves it to an SQL database
+
+    INPUT:
+    - dataframe
+    - name and filepath for the SQL database
+
+    OUTPUT: None
+    '''
+
+    engine = create_engine('sqlite:///{}'.format(database_filename))
+    df.to_sql('disaster_messages', engine, index=False)
 
 
 def main():
