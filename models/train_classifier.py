@@ -6,6 +6,7 @@ import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
 import re
+import pickle
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -32,27 +33,29 @@ def load_data(database_filepath):
     - Classification matrix (the prediction targets)
     '''
     engine = create_engine(database_filepath)
-    df = pd.read_sql_table('responses', engine)
+    df = pd.read_sql_table('disaster_messages', engine)
+
+    #df = df[:200]
 
     X = df['message']
     Y = df.iloc[:, 4:]
 
-    X = X[:200]
-    Y = Y[:200]
+    category_names = Y.columns
 
-    return X, Y
+    return X, Y, category_names
 
 
 def tokenize(text):
     '''Function that takes in a text splits with white spaces and creates list of words'''
-    text = text.lower()
-    text = re.sub(r"[^a-zA-Z0-9]", " ", text)
+    
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
     word_list = nltk.tokenize.word_tokenize(text)
-    word_list = [n for n in word_list if n not in stopwords.words("english")]
+    
+    stop = stopwords.word("english")
+    word_list = [t for t in word_list if t not in stop]
 
-    lemmed_list = [WordNetLemmatizer().lemmatize(n, pos='v')
-                   for n in word_list]
+    lemmed_list = [WordNetLemmatizer().lemmatize(w) for w in word_list]
 
     return lemmed_list
 
@@ -72,15 +75,17 @@ def build_model():
         ('clf', MultiOutputClassifier(RandomForestClassifier(random_state=1)))
     ])
     
+    #parameters = {
     parameters = {
-        'clf__estimator__criterion': ['gini', 'entropy'],
-        'clf__estimator__n_estimators': [5, 10, 20],
-        'clf__estimator__min_samples_split': [2, 4, 6]
-    }
+        'tfidf__use_idf': (True, False),
+        'clf__estimator__n_estimators': [10, 20]
+}
 
-    cv = GridSearchCV(pipeline, param_grid=parameters, verbose=3, n_jobs=-2)
-    return cv
+    cv = GridSearchCV(pipeline, param_grid = parameters)
 
+    model = cv
+
+    return model
 
 def evaluate_model(model, X_test, Y_test, category_names):
     '''
