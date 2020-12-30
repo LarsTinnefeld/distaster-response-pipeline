@@ -19,14 +19,9 @@ def load_data(messages_filepath, categories_filepath):
 
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    df = messages.merge(categories, how='inner', on='id')
+    df = messages.merge(categories, on='id')
 
     # Splitting the category column into individual category columns
-    categories = categories['categories'].str.split(';', expand=True)
-    cols = categories.iloc[0].str.split('-').str[0]
-    categories.columns = cols
-
-    # create a dataframe of the 36 individual category columns
     categories = categories['categories'].str.split(';', expand=True)
     cols = categories.iloc[0].str.split('-').str[0]
     categories.columns = cols
@@ -34,6 +29,12 @@ def load_data(messages_filepath, categories_filepath):
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].str[-1].astype(int)
+
+    # Merging tables
+    df = pd.concat([df, categories], axis = 1)
+
+    # Dropping categories column
+    df.drop('categories', axis = 1, inplace = True)
 
     return df
 
