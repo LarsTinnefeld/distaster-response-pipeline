@@ -83,9 +83,7 @@ def build_model():
 
     cv = GridSearchCV(pipeline, param_grid = parameters)
 
-    model = cv
-
-    return model
+    return cv
 
 def evaluate_model(model, X_test, Y_test, category_names):
     '''
@@ -104,7 +102,13 @@ def evaluate_model(model, X_test, Y_test, category_names):
     pred_test = model.predict(X_test)
 
     # Classification report
-    print(classification_report(Y_test, pred_test, target_names=category_names))
+    i = 0
+    for col in Y_test:
+        print('Feature {}: {}'.format(i + 1, col))
+        print(classification_report(Y_test[col], pred_test[:, i]))
+        i = i + 1
+    accuracy = (pred_test == Y_test.values).mean()
+    print('The model accuracy is {:.3f}'.format(accuracy))
 
 
 def save_model(model, model_filepath):
@@ -115,8 +119,6 @@ def save_model(model, model_filepath):
 def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
-        #database_filepath = 'sqlite:///../data/DisasterResponse.db'
-        #model_filepath = 'disaster_messages'
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(
