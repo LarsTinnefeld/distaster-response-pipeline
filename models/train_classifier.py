@@ -32,7 +32,7 @@ def load_data(database_filepath):
     - Input feature vector "messages"
     - Classification matrix (the prediction targets)
     '''
-    engine = create_engine(database_filepath)
+    engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('disaster_messages', engine)
 
     #df = df[:200]
@@ -52,7 +52,7 @@ def tokenize(text):
 
     word_list = nltk.tokenize.word_tokenize(text)
     
-    stop = stopwords.word("english")
+    stop = stopwords.words("english")
     word_list = [t for t in word_list if t not in stop]
 
     lemmed_list = [WordNetLemmatizer().lemmatize(w) for w in word_list]
@@ -115,6 +115,8 @@ def save_model(model, model_filepath):
 def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
+        #database_filepath = 'sqlite:///../data/DisasterResponse.db'
+        #model_filepath = 'disaster_messages'
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(
