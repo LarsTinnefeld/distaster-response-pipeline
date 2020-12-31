@@ -25,7 +25,7 @@ Following libraries are used in the system development:
 - sklearn
 
 ## Objectives <a name="objectives"></a>
-The main goal of the ETL Disaster Response Pipeline is to categorize messages through an algorithm and displaying the result on the screen. This is helpting to streamline the process of prioritizing messages and providing a fast overview of the potential content (disaster category).
+The main goal of the ETL Disaster Response Pipeline is to categorize messages through an algorithm and displaying the result on the screen. This is helpting to streamline the process of prioritizing messages and providing a fast overview of the potential content (disaster category). The application is based on NLP processing of existing messages. The machine learning process initially analyses texts which are flagged with disaster category labels and learns in this way to prdict which texy is linked to which disaster classes.
 
 ## Approach <a name="approach"></a>
 For the development of the application, the ETL pipeline was initially drafted and tested in Jupyter Notebooks, and then transfered to files which were in the end responsible to perform the training process.
