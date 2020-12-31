@@ -6,4 +6,23 @@ Lars Tinnefeld 2020-12-28
 *Image [Chris Gallagher](https://unsplash.com/@chriswebdog) on Unsplash*
 
 ---
+## Table of content
+1. [Used libraries](#installation)
+2. [Objectives](#objectives)
+3. [Approach](#approach)
+4. [Data](#data)
+5. [Data preparation](#preparation)
+8. [Instructions](#instruction)
 
+## Libraries <a name="installation"></a>
+Following libraries are used in the system development:
+- sys
+- pandas
+- sqlalchemy
+- nltk
+- re
+- pickle
+- sklearn
+
+## Objectives <a name="objectives"></a>
+The main goal of the Disaster Response Pipeline is to 
