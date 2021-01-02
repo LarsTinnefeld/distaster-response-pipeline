@@ -33,3 +33,5 @@ The ETL pipeline consists of following process steps:
 - **Extract** the data from a data source from a data source (in this case two csv files)
 - **Transform** the data through data cleaning, sparating the category classes in individual labels, merging the information to a combined data table and saving that table in a sql database
 - **Load** the data from the sql database, separate the result labels (disaster classes) and the input data (text messages), splitting into train- and test sets...
+
+## Data <a name="data"></a>
