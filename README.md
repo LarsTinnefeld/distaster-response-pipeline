@@ -57,3 +57,5 @@ Instructions for how to execute the app is at the end of this README.
 ## Data <a name="data"></a>
 The data and the project idea was provided from Udacity and [Figure Eight](https://appen.com/).
 
+**messages.csv**
+26,248 records
