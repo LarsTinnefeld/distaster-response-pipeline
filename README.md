@@ -29,9 +29,28 @@ The main goal of the ETL Disaster Response Pipeline is to categorize messages th
 
 ## Approach <a name="approach"></a>
 For the development of the application, the ETL pipeline was initially drafted and tested in Jupyter Notebooks, and then transfered to files which were in the end responsible to perform the training process.
-The ETL pipeline consists of following process steps:
+
+1) The ETL pipeline consists of following process steps:
 - **Extract** the data from a data source from a data source (in this case two csv files)
 - **Transform** the data through data cleaning, sparating the category classes in individual labels, merging the information to a combined data table and saving that table in a sql database
-- **Load** the data from the sql database, separate the result labels (disaster classes) and the input data (text messages), splitting into train- and test sets...
+- **Load** the data to a sql database
+
+2) Machine learning process:
+- Extract data from database
+- Separate the result labels (disaster classes) and input data (text messages)
+- Split into train- and test sets
+- Set up NLP model
+- Train model with train data
+- Generate predictions with test data
+- Evaluate model
+- Adjust parameters to increade prediction accuracy
+- Store model for the use in the web application
+
+3) Flask web application:
+- Form field to read in a text which a user enters
+- The text is processed in the backend's model
+- The disaster class is highlighted in a table which is displayed to the user
 
 ## Data <a name="data"></a>
+The data and the project idea was provided from Udacity and [Figure Eight](https://appen.com/).
+
