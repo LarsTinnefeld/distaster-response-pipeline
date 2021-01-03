@@ -59,3 +59,4 @@ The data and the project idea was provided from Udacity and [Figure Eight](https
 
 **messages.csv**
 26,248 records
+![messages](https://github.com/LarsTinnefeld/distaster-response-pipeline/blob/main/Media/messages_csv.PNG?raw=true)
