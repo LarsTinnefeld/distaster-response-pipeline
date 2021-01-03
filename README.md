@@ -46,12 +46,14 @@ This process is executed in `process_data.py` and prepared in the Jupyter notebo
 - Evaluate model
 - Adjust parameters to increade prediction accuracy
 - Store model for the use in the web application
+
 This process is executed in `train_classifier.py` and prepared in the Jupyter notebook `ML_Pipeline_Preparation.ipynb`.
 
 **3) Flask web application:**
 - Form field to read in a text which a user enters
 - The text is processed in the backend's model
 - The disaster class is highlighted in a table which is displayed to the user
+
 Instructions for how to execute the app is at the end of this README.
 
 ## Data <a name="data"></a>
