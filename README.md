@@ -64,6 +64,7 @@ The data and the project idea was provided from Udacity and [Figure Eight](https
 
 
 **messages.csv**
+26,248 records
 
 ![categories](https://github.com/LarsTinnefeld/distaster-response-pipeline/blob/main/Media/categories_csv.PNG?raw=true)
 
@@ -73,8 +74,8 @@ To execute the app follow the instructions:
 
 1. Run the following commands in the project's root directory to set up your database and model.
 
-...-Run ETL pipeline: `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
-...-Run ML pipeline: `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
+- Run ETL pipeline: `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
+- Run ML pipeline: `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
 2. Run the following command in the command line in the app's directory: `python run.py`
 
 3. Open new web browser and go to http://0.0.0.0:3001/
