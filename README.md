@@ -70,6 +70,13 @@ The data and the project idea was provided from [Udacity](https://www.udacity.co
 
 ![categories](https://github.com/LarsTinnefeld/distaster-response-pipeline/blob/main/Media/categories_csv.PNG?raw=true)
 
+
+## Preparations <a name="preparation"></a>
+The files of the application are stored in following structure:
+
+![file_structure](https://github.com/LarsTinnefeld/distaster-response-pipeline/blob/main/Media/file_structure.PNG?raw=true)
+
+
 ## Instructions <a name="instructions"></a>
 
 To execute the app follow the instructions:
