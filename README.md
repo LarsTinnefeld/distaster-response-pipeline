@@ -79,7 +79,7 @@ The files of the application are stored in following structure:
 
 ## Instructions <a name="instructions"></a>
 
-To execute the app follow the instructions:
+Instructions to execute the application on a local computer:
 
 1. Run the following commands in the project's root directory to set up your database and model.
 
