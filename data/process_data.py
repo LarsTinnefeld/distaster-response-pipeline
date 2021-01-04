@@ -28,7 +28,9 @@ def load_data(messages_filepath, categories_filepath):
 
     for column in categories:
         # set each value to be the last character of the string
-        categories[column] = categories[column].str[-1].astype(int)
+        categories[column] = categories[column].astype(str).str[-1]
+        categories[column] = categories[column].astype(int)
+        categories[column].loc[categories[column] > 0] = 1
 
     # Merging tables
     df = pd.concat([df, categories], axis = 1)
@@ -69,7 +71,7 @@ def save_data(df, database_filename):
     '''
 
     engine = create_engine('sqlite:///{}'.format(database_filename))
-    df.to_sql('disaster_messages', engine, index=False)
+    df.to_sql('disaster_messages', engine, index=False, if_exists='replace')
 
 
 def main():
