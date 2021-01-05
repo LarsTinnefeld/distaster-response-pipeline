@@ -15,6 +15,7 @@ from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
+
 def tokenize(text):
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
@@ -26,6 +27,7 @@ def tokenize(text):
 
     return clean_tokens
 
+
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('disaster_messages', engine)
@@ -34,17 +36,29 @@ df = pd.read_sql_table('disaster_messages', engine)
 model = joblib.load("../models/classifier.pkl")
 
 
+def word_bagger(w_lst):
+    word_dict = {}
+    for message in w_lst:
+        lemm_lst = tokenize(message)
+        for w in lemm_lst:
+            if w in word_dict:
+                word_dict[w] += 1
+            else:
+                word_dict.update({w: 1})
+    return word_dict
+
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
+
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
-    
+
+    cat_counts = df.iloc[:, 4:].sum().sort_values(ascending=False)
+    cat_names = df.iloc[:, 4:].columns
 
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -71,12 +85,12 @@ def index():
         {
             'data': [
                 Bar(
-                    x =
-                    y = 
+                    x=cat_names,
+                    y=cat_counts
                 )
             ],
             'layout': {
-                'title': '',
+                'title': 'Disaster Category Distribution',
                 'yaxis': {
                     'title': ""
                 },
@@ -84,32 +98,32 @@ def index():
                     'title': ""
                 }
             }
-        },
+        }  # ,
 
-        {
-            'data': [
-                Bar(
-                    x =
-                    y = 
-                )
-            ],
-            'layout': {
-                'title': '',
-                'yaxis': {
-                    'title': ""
-                },
-                'xaxis': {
-                    'title': ""
-                }
-            }
-        }
+        # {
+        #    'data': [
+        #        Bar(
+        #            x=None,
+        #            y=None,
+        #        )
+        #    ],
+        #    'layout': {
+        #        'title': '',
+        #        'yaxis': {
+        #            'title': ""
+        #        },
+        #        'xaxis': {
+        #            'title': ""
+        #        }
+        #    }
+        # }
 
     ]
-    
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -118,13 +132,13 @@ def index():
 @app.route('/go')
 def go():
     # save user input in query
-    query = request.args.get('query', '') 
+    query = request.args.get('query', '')
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
 
-    # This will render the go.html Please see that file. 
+    # This will render the go.html Please see that file.
     return render_template(
         'go.html',
         query=query,
