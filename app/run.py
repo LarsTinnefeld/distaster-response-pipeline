@@ -2,8 +2,11 @@ import json
 import plotly
 import pandas as pd
 
+import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import re
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -15,17 +18,37 @@ from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
+# ****************** Functions to generate data for the visualizations *****************************
+
 
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
+    '''Function that takes in a text splits with white spaces and creates list of words'''
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
+    word_list = nltk.tokenize.word_tokenize(text)
 
-    return clean_tokens
+    stop = stopwords.words("english")
+    word_list = [t for t in word_list if t not in stop]
+
+    lemmed_list = [WordNetLemmatizer().lemmatize(w) for w in word_list]
+
+    return lemmed_list
+
+
+def word_bagger(w_lst):
+    '''Function that iterates through a list of texts, bundles separate words with count, sort by count and stored top 15 in a dataframe'''
+    word_dict = {}
+    for message in w_lst:
+        lemm_lst = tokenize(message)
+        for w in lemm_lst:
+            if w in word_dict:
+                word_dict[w] += 1
+            else:
+                word_dict.update({w: 1})
+
+    word_df = pd.DataFrame.from_dict(word_dict, orient='index', columns=[
+                                     'Count']).sort_values('Count', ascending=False).head(15)
+    return word_df
 
 
 # load data
@@ -35,17 +58,6 @@ df = pd.read_sql_table('disaster_messages', engine)
 # load model
 model = joblib.load("../models/classifier.pkl")
 
-
-def word_bagger(w_lst):
-    word_dict = {}
-    for message in w_lst:
-        lemm_lst = tokenize(message)
-        for w in lemm_lst:
-            if w in word_dict:
-                word_dict[w] += 1
-            else:
-                word_dict.update({w: 1})
-    return word_dict
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
@@ -57,8 +69,13 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
 
+    # Data for visualization 2
     cat_counts = df.iloc[:, 4:].sum().sort_values(ascending=False)
     cat_names = df.iloc[:, 4:].columns
+
+    # Data for visualisation 3
+    word_counts = word_bagger(df['message'])['Count']
+    word_names = word_bagger(df['message']).index.tolist()
 
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -92,32 +109,28 @@ def index():
             'layout': {
                 'title': 'Disaster Category Distribution',
                 'yaxis': {
-                    'title': ""
-                },
-                'xaxis': {
-                    'title': ""
+                    'title': "Count of classifications"
                 }
             }
-        }  # ,
+        },
 
-        # {
-        #    'data': [
-        #        Bar(
-        #            x=None,
-        #            y=None,
-        #        )
-        #    ],
-        #    'layout': {
-        #        'title': '',
-        #        'yaxis': {
-        #            'title': ""
-        #        },
-        #        'xaxis': {
-        #            'title': ""
-        #        }
-        #    }
-        # }
-
+        {
+            'data': [
+                Bar(
+                    x=word_names,
+                    y=word_counts,
+                )
+            ],
+            'layout': {
+                'title': 'Top 15 used words',
+                'yaxis': {
+                    'title': "Count of appearances"
+                },
+                'xaxis': {
+                    'title': "Words"
+                }
+            }
+        }
     ]
 
     # encode plotly graphs in JSON
